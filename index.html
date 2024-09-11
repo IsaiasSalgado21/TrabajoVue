@@ -1,62 +1,118 @@
-<script type="importmap">
-    {
-      "imports": {
-        "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
-      }
-    }
-</script>
-  
-<div id = "nameApp">
-    <p>Hola, {{ nombre }}</p>
-    <input v-model="nombre" placeholder="escribe tu nombre"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script type="importmap">
+        {
+          "imports": {
+            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+          }
+        }
+    </script>
+      
+    <div id = "nameApp">
+        <p>Hola, {{ nombre }}</p>
+        <input v-model="nombre" placeholder="escribe tu nombre"/> 
+    </div>
     
-</div>
+    <div id="contador">
+        <button @click="count++">Click me {{ count }}</button>
+    </div>
 
-<div id="contador">
-    <button @click="count++">Click me {{ count }}</button>
-</div>
-<label> Calculadora</label>
- <div id = "sumarApp">
-    <input v-model.number="numero1">
-    <input v-model.number="numero2">
-    <button @click="sumar">Sumar</button>
-    <p>Resultado: {{ resultado }}</p>
- </div>
+    <label> Calculadora</label>
+     <div id = "sumarApp">
+        <input v-model.number="numero1">
+        <input v-model.number="numero2">
+        <button @click="sumar">Sumar</button>
+        <p>Resultado: {{ resultado }}</p>
+     </div>
 
-  <script type="module">
-    import { createApp, ref } from 'vue'
-  
-    const app1 = createApp({
-      data() {
+     <div id="listaUsuarios">
+        <label>Nombre:</label>
+        <input v-model="name" placeholder="Escribe un nombre">
+        <label>Rol:</label>
+        <input v-model="rol" placeholder="Escribe un rol">
+        <button @click="añadirUsuario">Añadir</button>
+    
+        <p>Usuarios:</p>
+        <ul>
+            <li v-for="(usuario, index) in user" :key="index">
+                Nombre: {{ usuario.name }} - Rol: {{ usuario.rol }}
+            </li>
+        </ul>
+    </div>
+    
+      <script type="module">
+        import { createApp, ref } from 'vue'
+
+        const app1 = createApp({
+          data() {
+            return {
+              nombre:''
+            }
+          }
+        })
+        app1.mount('#nameApp')
+    
+        const app2 = createApp({
+            data(){
+                return{
+                    count: 0
+                }
+            }
+        })
+        app2.mount('#contador')
+    
+        const app3 = createApp({
+            data(){
+                return{
+                    numero1: 0,
+                    numero2: 0,
+                    resultado: 0
+                }
+            },
+            methods:{
+                sumar() {
+                this.resultado = this.numero1 + this.numero2;
+                }
+            }
+        });
+        app3.mount('#sumarApp')
+
+        const app4 = createApp({
+    setup() {
+        let name = ref('');
+        let rol = ref('');
+        let user = ref([
+            {
+                "name": "isaias",
+                "rol": "frontend"
+            }
+        ]);
+
+        const añadirUsuario = () => {
+                user.value.push({
+                    name: name.value,
+                    rol: rol.value
+                });
+                name.value = '';
+                rol.value = '';
+        };
+
         return {
-          nombre:''
-        }
-      }
-    })
-    app1.mount('#nameApp')
+            user,
+            name,
+            rol,
+            añadirUsuario
+        };
+    }
+});
+app4.mount('#listaUsuarios');
 
-    const app2 = createApp({
-        data(){
-            return{
-                count: 0
-            }
-        }
-    })
-    app2.mount('#contador')
-
-    const app3 = createApp({
-        data(){
-            return{
-                numero1: 0,
-                numero2: 0,
-                resultado: 0
-            }
-        },
-        methods:{
-            sumar() {
-            this.resultado = this.numero1 + this.numero2;
-            }
-        }
-    });
-    app3.mount('#sumarApp')
-  </script>
+      </script>
+</body>
+</html>
