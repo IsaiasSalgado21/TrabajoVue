@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
 </head>
 <body>
     <script type="importmap">
@@ -13,106 +13,62 @@
           }
         }
     </script>
-      
-    <div id = "nameApp">
-        <p>Hola, {{ nombre }}</p>
-        <input v-model="nombre" placeholder="escribe tu nombre"/> 
+
+    <div id="listaUsuarios">
+
+        <fieldset v-if="!logeado">
+            <label>Email:</label>
+            <input v-model="email" placeholder="Email">
+            <label>Password:</label>
+            <input v-model="password" placeholder="Password" type="password">
+            <button @click="login">Acceder</button>
+        </fieldset>
+
+        <div v-if="logeado">
+            <h1>¡Bienvenido, {{ usuarioActual.email }}!</h1>
+        </div>
+
+        <div v-if="mensaje">
+            <h3>{{ mensaje }}</h3>
+        </div>
     </div>
     
-    <div id="contador">
-        <button @click="count++">Click me {{ count }}</button>
-    </div>
-
-    <label> Calculadora</label>
-     <div id = "sumarApp">
-        <input v-model.number="numero1">
-        <input v-model.number="numero2">
-        <button @click="sumar">Sumar</button>
-        <p>Resultado: {{ resultado }}</p>
-     </div>
-
-     <div id="listaUsuarios">
-        <label>Nombre:</label>
-        <input v-model="name" placeholder="Escribe un nombre">
-        <label>Rol:</label>
-        <input v-model="rol" placeholder="Escribe un rol">
-        <button @click="añadirUsuario">Añadir</button>
-    
-        <p>Usuarios:</p>
-        <ul>
-            <li v-for="(usuario, index) in user" :key="index">
-                Nombre: {{ usuario.name }} - Rol: {{ usuario.rol }}
-            </li>
-        </ul>
-    </div>
-    
-      <script type="module">
-        import { createApp, ref } from 'vue'
-
-        const app1 = createApp({
-          data() {
-            return {
-              nombre:''
-            }
-          }
-        })
-        app1.mount('#nameApp')
-    
-        const app2 = createApp({
-            data(){
-                return{
-                    count: 0
-                }
-            }
-        })
-        app2.mount('#contador')
-    
-        const app3 = createApp({
-            data(){
-                return{
-                    numero1: 0,
-                    numero2: 0,
-                    resultado: 0
-                }
-            },
-            methods:{
-                sumar() {
-                this.resultado = this.numero1 + this.numero2;
-                }
-            }
-        });
-        app3.mount('#sumarApp')
+    <script type="module">
+        import { createApp, ref } from 'vue';
 
         const app4 = createApp({
-    setup() {
-        let name = ref('');
-        let rol = ref('');
-        let user = ref([
-            {
-                "name": "isaias",
-                "rol": "frontend"
+            setup() {
+                let email = ref('');
+                let password = ref('');
+                let mensaje = ref('');
+                let logeado = ref(false);
+                let usuarioActual = ref({});
+
+                const login = async () => {
+                    try {
+                        const response = await fetch('users.json');
+                        const users = await response.json();
+                        const usuarioValido = users.find(user => user.email === email.value && user.password === password.value);
+
+                        if (usuarioValido) {
+                            logeado.value = true;
+                            usuarioActual.value = usuarioValido;
+                        } else {
+                            mensaje.value = 'Email o contraseña incorrectos.';
+                        }
+
+                        email.value = '';
+                        password.value = '';
+                    } catch (error) {
+                        mensaje.value = 'Error al verificar el usuario.';
+                    }
+                };
+
+                return { email, password, mensaje, logeado, usuarioActual, login };
             }
-        ]);
+        });
 
-        const añadirUsuario = () => {
-                user.value.push({
-                    name: name.value,
-                    rol: rol.value
-                });
-                name.value = '';
-                rol.value = '';
-        };
-
-        return {
-            user,
-            name,
-            rol,
-            añadirUsuario
-        };
-    }
-});
-app4.mount('#listaUsuarios');
-
-      </script>
+        app4.mount('#listaUsuarios');
+    </script>
 </body>
 </html>
