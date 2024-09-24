@@ -7,6 +7,7 @@
             <th>Nombre</th>
             <th>Teléfono</th>
             <th>Empresa</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -14,6 +15,10 @@
             <td>{{ usuario.name }}</td>
             <td>{{ usuario.phone }}</td>
             <td>{{ usuario.company.name }}</td>
+            <td>
+              <button @click="eliminarUsuario(usuario.id)"> eliminar</button>
+              <button> editar </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -24,6 +29,11 @@
   export default {
     name: "UserTableComponent",
     props: ["usuarios"],
+    methods:{
+      eliminarUsuario(id){
+        this.$emit("eliminar-usuario",id);
+      },
+    },
   };
   </script>
   

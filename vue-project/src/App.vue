@@ -4,7 +4,7 @@
     <div v-if="logueado">
       <h1>¡Bienvenido, {{ usuarioActual.name }}!</h1>
       <button @click="cerrarSesion">Cerrar sesión</button>
-      <UserTableComponent :usuarios="usuarios" />
+      <UserTableComponent :usuarios="usuarios" @eliminar-usuario="eliminarUsuario" />
     </div>
   </div>
 </template>
@@ -54,8 +54,12 @@ export default {
       usuarios.value = [];
       sessionStorage.removeItem("usuario");
     };
+    
+    const eliminarUsuario = (id) => {
+      usuarios.value= usuarios.value.filter(usuario => usuario.id !== id);
+    };
 
-    return { logueado, usuarioActual, usuarios, manejarInicioSesionExitoso, cerrarSesion };
+    return { logueado, usuarioActual, usuarios, manejarInicioSesionExitoso, cerrarSesion, eliminarUsuario };
   },
 };
 </script>
