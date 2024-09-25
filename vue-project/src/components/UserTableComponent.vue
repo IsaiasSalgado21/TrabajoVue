@@ -27,11 +27,11 @@
 
 <script>
 export default {
-  name: "UserTableComponent",
-  props: ["usuarios"],
+  name: 'UserTableComponent',
+  props: ['usuarios'],
   methods: {
     eliminarUsuario(id) {
-      this.$emit("eliminar-usuario", id);
+      this.$emit('eliminar-usuario', id);
     },
   },
 };
