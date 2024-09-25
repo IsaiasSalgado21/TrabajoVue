@@ -1,50 +1,49 @@
 <template>
-    <fieldset v-if="!logueado">
+  <div>
+    <h2>Iniciar Sesión</h2>
+    <form @submit.prevent="iniciarSesion">
       <label>Email:</label>
-      <input v-model="correo" placeholder="Email" />
+      <input v-model="email" type="email" />
+
       <label>Contraseña:</label>
-      <input v-model="contraseña" placeholder="Contraseña" type="password" />
-      <button @click="iniciarSesion">Acceder</button>
-      <div v-if="mensaje">{{ mensaje }}</div>
-    </fieldset>
-  </template>
-  
-  <script>
-  import { ref } from "vue";
-  
-  export default {
-    name: "LoginComponent",
-    emits: ["inicio-sesion-exitoso"],
-    setup(props, { emit }) {
-      let correo = ref("");
-      let contraseña = ref("");
-      let mensaje = ref("");
-  
-      const iniciarSesion = async () => {
-        try {
-          const response = await fetch("/users.json");
-          const usuarios = await response.json();
-          const usuarioValido = usuarios.find(
-            (usuario) =>
-              usuario.email === correo.value && usuario.password === contraseña.value
-          );
-  
-          if (usuarioValido) {
-            sessionStorage.setItem("usuario", JSON.stringify(usuarioValido));
-            emit("inicio-sesion-exitoso", usuarioValido);
-          } else {
-            mensaje.value = "Correo o contraseña incorrectos.";
-          }
-  
-          correo.value = "";
-          contraseña.value = "";
-        } catch (error) {
-          mensaje.value = "Error al verificar el usuario.";
+      <input v-model="password" type="password" />
+
+      <button type="submit">Iniciar Sesión</button>
+    </form>
+    <p v-if="error">{{ error }}</p>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      email: '',
+      password: '',
+      error: null,
+    };
+  },
+  methods: {
+    async iniciarSesion() {
+      try {
+        const response = await fetch('/users.json');
+        const usuarios = await response.json();
+
+        const usuarioEncontrado = usuarios.find(
+          (usuario) => usuario.email === this.email && usuario.password === this.password
+        );
+
+        if (usuarioEncontrado) {
+          this.$emit('inicio-sesion-exitoso', usuarioEncontrado);
+          sessionStorage.setItem('usuario', JSON.stringify(usuarioEncontrado));
+        } else {
+          this.error = 'Error al verificar el usuario. Email o contraseña incorrectos.';
         }
-      };
-  
-      return { correo, contraseña, mensaje, iniciarSesion };
+      } catch (error) {
+        this.error = 'Error al verificar el usuario.';
+        console.error('Error al cargar los usuarios', error);
+      }
     },
-  };
-  </script>
-  
+  },
+};
+</script>
