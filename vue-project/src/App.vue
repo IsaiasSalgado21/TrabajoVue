@@ -4,7 +4,25 @@
     <div v-if="logueado">
       <h1>¡Bienvenido, {{ usuarioActual.name }}!</h1>
       <button @click="cerrarSesion">Cerrar sesión</button>
-      <UserTableComponent :usuarios="usuarios" @eliminar-usuario="eliminarUsuario" />
+      <UserTableComponent :usuarios="usuarios" 
+                          @eliminar-usuario="eliminarUsuario" 
+                          @seleccionar-usuario-para-editar="seleccionarUsuarioEditar" />
+    </div>
+    <div v-if="usuarioEditando">
+      <h2>Editar usuario: {{ usuarioEditando.name }}</h2>
+      <form @submit.prevent="guardarCambiosUsuario">
+        <label>Nombre:</label>
+        <input v-model="usuarioEditando.name" />
+
+        <label>Teléfono:</label>
+        <input v-model="usuarioEditando.phone" />
+
+        <label>Empresa:</label>
+        <input v-model="usuarioEditando.company.name" />
+
+        <button type="submit">Guardar</button>
+        <button type="button" @click="cancelarEdicion">Cancelar</button>
+      </form>
     </div>
   </div>
 </template>
@@ -24,6 +42,7 @@ export default {
     let logueado = ref(false);
     let usuarioActual = ref(null);
     let usuarios = ref([]);
+    let usuarioEditando = ref(null);
 
     const cargarUsuarios = async () => {
       try {
@@ -54,12 +73,39 @@ export default {
       usuarios.value = [];
       sessionStorage.removeItem("usuario");
     };
-    
+
     const eliminarUsuario = (id) => {
-      usuarios.value= usuarios.value.filter(usuario => usuario.id !== id);
+      usuarios.value = usuarios.value.filter((usuario) => usuario.id !== id);
     };
 
-    return { logueado, usuarioActual, usuarios, manejarInicioSesionExitoso, cerrarSesion, eliminarUsuario };
+    const seleccionarUsuarioEditar = (usuario) => {
+      usuarioEditando.value = { ...usuario };
+    };
+
+    const guardarCambiosUsuario = () => {
+      const index = usuarios.value.findIndex((u) => u.id === usuarioEditando.value.id);
+      if (index !== -1) {
+        usuarios.value[index] = { ...usuarioEditando.value };
+        usuarioEditando.value = null;
+      }
+    };
+
+    const cancelarEdicion = () => {
+      usuarioEditando.value = null;
+    };
+
+    return {
+      logueado,
+      usuarioActual,
+      usuarios,
+      usuarioEditando,
+      manejarInicioSesionExitoso,
+      cerrarSesion,
+      eliminarUsuario,
+      seleccionarUsuarioEditar,
+      guardarCambiosUsuario,
+      cancelarEdicion,
+    };
   },
 };
 </script>
